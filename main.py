@@ -1,7 +1,7 @@
 import requests
 import datetime
 
-from stations import LBC
+from stations import *
 
 
 
@@ -13,12 +13,12 @@ def filename():
 
     FORMAT = '.mp3'
 
-    return DATE_FORMATTED+FORMAT
+    return DATE_FORMATTED + FORMAT
 
 
-def record():
+def record(station):
 
-    r = requests.get(LBC, stream=True)
+    r = requests.get(station, stream=True)
 
     with open(filename(), 'wb') as f:
         try:

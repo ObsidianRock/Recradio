@@ -1,2 +1,3 @@
 
-LBC = 'http://media-ice.musicradio.com/LBCLondonMP3'
+lbc = 'http://media-ice.musicradio.com/LBCLondonMP3'
+bbc_radio_4 = 'http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio4fm_mf_p'
