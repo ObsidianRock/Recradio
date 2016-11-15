@@ -1,7 +1,8 @@
 import requests
 import datetime
+import argparse
 
-from stations import *
+from stations import STATIONS
 
 
 
@@ -16,7 +17,9 @@ def filename():
     return DATE_FORMATTED + FORMAT
 
 
-def record(station):
+def record(call):
+
+    station = STATIONS[call]
 
     r = requests.get(station, stream=True)
 
@@ -28,4 +31,8 @@ def record(station):
             pass
 
 if __name__ == "__main__":
-    record()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('station', help='Radio station')
+    args = parser.parse_args()
+
+    record(args.station)
