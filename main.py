@@ -39,10 +39,20 @@ def filename():
 
     return DATE_FORMATTED + FORMAT
 
+def get_station(call):
 
-def record(call,time):
+    setting = config_file()
+    try:
+        station = setting['STATION'][call]
+    except KeyError:
+        print('Station does not exist')
+        sys.exit()
+    return station
 
-    station = STATIONS[call]
+
+def record():
+
+    station = get_station(call)
 
     r = requests.get(station, stream=True)
 
