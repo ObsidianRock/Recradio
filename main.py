@@ -5,7 +5,7 @@ import configparser
 import os
 import sys
 from threading import Thread, Event
-
+import keyboard
 
 def check_number(time):
 
@@ -55,7 +55,7 @@ def record(stop_event,file_name, station):
     with open(file_name, 'wb') as f:
         for block in r.iter_content(1024):
             f.write(block)
-            if stop_event.is_set():
+            if (keyboard.is_pressed('esc') or stop_event.is_set()):
                 break
     f.close()
     sys.exit()
@@ -66,7 +66,7 @@ def setup(call,time):
 
     stop_event = Event()
 
-    thr = Thread(target=record, args=(stop_event,file_name, station))
+    thr = Thread(target=record, args=(stop_event,file_name, station), daemon=True)
     thr.start()
 
     thr.join(time*60)
