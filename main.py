@@ -2,12 +2,14 @@ import requests
 import datetime
 import argparse
 import configparser
-
+import os
+import sys
 from stations import STATIONS
 
 
 
 def check_number(time):
+
     try:
         time = int(time)
     except ValueError:
@@ -19,9 +21,17 @@ def check_number(time):
         return time
 
 
+def config_file():
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    config = configparser.ConfigParser()
+    try:
+        config.read_file(open('setting.ini'))
+    except FileNotFoundError:
+        print('configuration file does not exist')
+        sys.exit()
+    return dict(config.item())
+
 def filename():
-
-
     DATE = datetime.datetime.utcnow()
     DATE_FORMATTED = DATE.strftime('%a-%d-%H-%M')
 
@@ -48,7 +58,7 @@ def main():
     parser.add_argument('station', type=str, help='Radio station')
     parser.add_argument('time', type=check_number, help='Time of recording')
     args = parser.parse_args()
-    
+
 
 
 
