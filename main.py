@@ -1,9 +1,22 @@
 import requests
 import datetime
 import argparse
+import configparser
 
 from stations import STATIONS
 
+
+
+def check_number(time):
+    try:
+        time = int(time)
+    except ValueError:
+        raise argparse.ArgumentTypeError('The time must a positive number')
+
+    if time < 1:
+        raise argparse.ArgumentTypeError('The time must be large then 1')
+    else:
+        return time
 
 
 def filename():
@@ -17,7 +30,7 @@ def filename():
     return DATE_FORMATTED + FORMAT
 
 
-def record(call):
+def record(call,time):
 
     station = STATIONS[call]
 
@@ -30,9 +43,14 @@ def record(call):
         except KeyboardInterrupt:
             pass
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('station', help='Radio station')
+    parser.add_argument('station', type=str, help='Radio station')
+    parser.add_argument('time', type=check_number, help='Time of recording')
     args = parser.parse_args()
+    
 
-    record(args.station)
+
+
+if __name__ == "__main__":
+    main()
