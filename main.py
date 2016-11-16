@@ -4,8 +4,7 @@ import argparse
 import configparser
 import os
 import sys
-from stations import STATIONS
-
+from threading import Thread, Event
 
 
 def check_number(time):
@@ -22,14 +21,13 @@ def check_number(time):
 
 
 def config_file():
-    basedir = os.path.abspath(os.path.dirname(__file__))
     config = configparser.ConfigParser()
     try:
         config.read_file(open('setting.ini'))
     except FileNotFoundError:
         print('configuration file does not exist')
         sys.exit()
-    return dict(config.item())
+    return dict(config.items())
 
 def filename():
     DATE = datetime.datetime.utcnow()
@@ -43,33 +41,46 @@ def get_station(call):
 
     setting = config_file()
     try:
-        station = setting['STATION'][call]
+        station = setting['STATIONS'][call]
     except KeyError:
         print('Station does not exist')
         sys.exit()
     return station
 
 
-def record():
-
-    station = get_station(call)
+def record(stop_event,file_name, station):
 
     r = requests.get(station, stream=True)
 
-    with open(filename(), 'wb') as f:
-        try:
-            for block in r.iter_content(1024):
-                f.write(block)
-        except KeyboardInterrupt:
-            pass
+    with open(file_name, 'wb') as f:
+        for block in r.iter_content(1024):
+            f.write(block)
+            if stop_event.is_set():
+                break
+    f.close()
+    sys.exit()
+
+def setup(call,time):
+    file_name = filename()
+    station = get_station(call)
+
+    stop_event = Event()
+
+    thr = Thread(target=record, args=(stop_event,file_name, station))
+    thr.start()
+
+    thr.join(time*60)
+
+    if thr.is_alive():
+        stop_event.set()
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('station', type=str, help='Radio station')
     parser.add_argument('time', type=check_number, help='Time of recording')
     args = parser.parse_args()
-
-
+    setup(args.station, args.time)
 
 
 if __name__ == "__main__":
