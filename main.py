@@ -1,11 +1,13 @@
-import requests
-import datetime
 import argparse
 import configparser
-import os
+import datetime
+
 import sys
 from threading import Thread, Event
+
 import keyboard
+import requests
+
 
 def check_number(time):
 
@@ -29,13 +31,13 @@ def config_file():
         sys.exit()
     return dict(config.items())
 
+
 def filename():
-    DATE = datetime.datetime.utcnow()
-    DATE_FORMATTED = DATE.strftime('%a-%d-%H-%M')
+    date_now = datetime.datetime.utcnow()
+    date_formatted = date_now.strftime('%a-%d-%H-%M')
+    file_format = '.mp3'
+    return date_formatted + file_format
 
-    FORMAT = '.mp3'
-
-    return DATE_FORMATTED + FORMAT
 
 def get_station(call):
 
@@ -55,12 +57,13 @@ def record(stop_event,file_name, station):
     with open(file_name, 'wb') as f:
         for block in r.iter_content(1024):
             f.write(block)
-            if (keyboard.is_pressed('esc') or stop_event.is_set()):
+            if keyboard.is_pressed('esc') or stop_event.is_set():
                 break
     f.close()
     sys.exit()
 
-def setup(call,time):
+
+def setup(call, time):
     file_name = filename()
     station = get_station(call)
 
