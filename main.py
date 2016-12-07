@@ -1,25 +1,12 @@
-import argparse
 import configparser
 import datetime
-
 import sys
+
 from threading import Thread, Event
 
+import click
 import keyboard
 import requests
-
-
-def check_number(time):
-
-    try:
-        time = int(time)
-    except ValueError:
-        raise argparse.ArgumentTypeError('The time must a positive number')
-
-    if time < 1:
-        raise argparse.ArgumentTypeError('The time must be large then 1')
-    else:
-        return time
 
 
 def config_file():
@@ -50,7 +37,7 @@ def get_station(call):
     return station
 
 
-def record(stop_event,file_name, station):
+def record(stop_event, file_name, station):
 
     r = requests.get(station, stream=True)
 
@@ -63,28 +50,31 @@ def record(stop_event,file_name, station):
     sys.exit()
 
 
-def setup(call, time):
+@click.command()
+@click.option('--station',
+              prompt='Enter Station',
+              help='Station to record')
+@click.option('--time',
+              prompt='Number of minutes',
+              type=click.INT,
+              help='Number of minutes to record')
+def setup(station, time):
+    click.clear()
+    if int(time) < 1:
+        click.secho('Time must be greater than 0', fg='red')
+        sys.exit()
+
     file_name = filename()
-    station = get_station(call)
+    station_name = get_station(station)
 
     stop_event = Event()
-
-    thr = Thread(target=record, args=(stop_event,file_name, station), daemon=True)
+    thr = Thread(target=record, args=(stop_event, file_name, station_name), daemon=True)
     thr.start()
-
-    thr.join(time*60)
+    thr.join(int(time)*60)
 
     if thr.is_alive():
         stop_event.set()
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('station', type=str, help='Radio station')
-    parser.add_argument('time', type=check_number, help='Time of recording')
-    args = parser.parse_args()
-    setup(args.station, args.time)
-
-
 if __name__ == "__main__":
-    main()
+    setup()
