@@ -46,7 +46,7 @@ Enter Station: [from setting.ini file]
 Number of minutes: [how long to record stream]
 ```
 
-### forcefully Stop stream recording
+### Forcefully Stop stream recording
 
 ```
 CTRL + Esc (Windows)
