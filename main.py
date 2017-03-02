@@ -27,7 +27,6 @@ def filename():
 
 
 def get_station(call):
-
     setting = config_file()
     try:
         station = setting['STATIONS'][call]
@@ -60,6 +59,7 @@ def record(stop_event, file_name, station):
               help='Number of minutes to record')
 def setup(station, time):
     click.clear()
+
     if int(time) < 1:
         click.secho('Time must be greater than 0', fg='red')
         sys.exit()
